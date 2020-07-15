@@ -23,8 +23,9 @@ class _ImageInputState extends State<ImageInput> {
       source: ImageSource.camera,
       maxWidth: 600,
     );
-    final tranformedFile = File(pickedFile.path);
+    if (pickedFile == null) return;
 
+    final tranformedFile = File(pickedFile.path);
     setState(() {
       _storedImage = tranformedFile;
     });

@@ -7,8 +7,6 @@ import 'package:great_places_app/screens/add_place_screen.dart';
 class PlacesListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final places = context.watch<GreatPlaces>().items;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Places'),
@@ -21,20 +19,33 @@ class PlacesListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: places.length <= 0
-          ? Center(
-              child: Text('Got no places yet, start adding some!'),
-            )
-          : ListView.builder(
-              itemCount: places.length,
-              itemBuilder: (ctx, i) => ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: FileImage(places[i].image),
+      body: FutureBuilder(
+        future: Provider.of<GreatPlaces>(context, listen: false)
+            .fetchAndSetPlaces(),
+        builder: (ctx, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Consumer<GreatPlaces>(
+                child: Center(
+                  child: Text('Got no places yet, start adding some!'),
                 ),
-                title: Text(places[i].title),
-                onTap: () {},
+                builder: (ctx, greatPlaces, ch) => greatPlaces.items.length <= 0
+                    ? ch
+                    : ListView.builder(
+                        itemCount: greatPlaces.items.length,
+                        itemBuilder: (ctx, i) => ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                FileImage(greatPlaces.items[i].image),
+                          ),
+                          title: Text(greatPlaces.items[i].title),
+                          onTap: () {},
+                        ),
+                      ),
               ),
-            ),
+      ),
     );
   }
 }
