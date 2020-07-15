@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:great_places_app/providers/great_places.dart';
 import 'package:great_places_app/widgets/image_input.dart';
 import 'package:great_places_app/widgets/location_input.dart';
+import 'package:great_places_app/models/place.dart';
 
 class AddPlaceScreen extends StatefulWidget {
   static const routeName = '/add-place';
@@ -17,17 +18,28 @@ class AddPlaceScreen extends StatefulWidget {
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _titleController = TextEditingController();
   File _pickedImage;
+  PlaceLocation _pickedLocation;
 
   void _selectImageHandler(File pickedImage) {
     _pickedImage = pickedImage;
   }
 
+  void _selectPlaceHandler(double lat, double lng) {
+    _pickedLocation = PlaceLocation(latitude: lat, longitude: lng);
+  }
+
   void _savePlaceHandler() {
-    if (_titleController.text.isEmpty || _pickedImage == null) {
+    if (_titleController.text.isEmpty ||
+        _pickedImage == null ||
+        _pickedLocation == null) {
       return;
     }
 
-    context.read<GreatPlaces>().addPlace(_titleController.text, _pickedImage);
+    context.read<GreatPlaces>().addPlace(
+          _titleController.text,
+          _pickedImage,
+          _pickedLocation,
+        );
     Navigator.of(context).pop();
   }
 
@@ -53,7 +65,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                     SizedBox(height: 10),
                     ImageInput(_selectImageHandler),
                     SizedBox(height: 10),
-                    LocationInput(),
+                    LocationInput(_selectPlaceHandler),
                   ],
                 ),
               ),
